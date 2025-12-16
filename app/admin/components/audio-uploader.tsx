@@ -51,6 +51,9 @@ export function AudioUploader({ recording_id, current_file, on_upload }: AudioUp
 
       const { data: url_data } = supabase.storage.from("audio").getPublicUrl(file_name)
 
+      console.log("[v0] Upload successful. File name in bucket:", file_name)
+      console.log("[v0] Public URL:", url_data.publicUrl)
+
       on_upload(url_data.publicUrl, file.name)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 2000)

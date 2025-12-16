@@ -28,6 +28,7 @@ type ListenEditorProps = {
 
 export function ListenEditor({ content, updateContent, saveSection }: ListenEditorProps) {
   const [saving, setSaving] = useState(false)
+  const [recordingsSaving, setRecordingsSaving] = useState(false)
 
   const pageContent = content.listen_page?.content || { title: "Listen", intro: "", description: "", recordings: [] }
   const recordings: Recording[] = (pageContent.recordings || []).sort((a: Recording, b: Recording) => a.order - b.order)
@@ -36,6 +37,13 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
     setSaving(true)
     await saveSection("listen_page")
     setSaving(false)
+  }
+
+  const handleSaveRecordings = async () => {
+    setRecordingsSaving(true)
+    console.log("[v0] Saving recordings. Current content:", JSON.stringify(pageContent, null, 2))
+    await saveSection("listen_page")
+    setRecordingsSaving(false)
   }
 
   const updatePageField = (field: string, value: string) => {
@@ -98,7 +106,7 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
             size="sm"
             className="font-sans bg-transparent"
           >
-            {saving ? "Saving..." : "Save All"}
+            {saving ? "Saving..." : "Save"}
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -135,12 +143,23 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
           <div>
             <CardTitle className="text-lg font-serif font-light">Recordings</CardTitle>
             <p className="text-sm text-muted-foreground font-sans mt-1">
-              Audio files should be uploaded to <code className="bg-muted px-1 rounded">public/audio/</code>
+              Upload audio files and manage recording order, labels, and visibility
             </p>
           </div>
-          <Button onClick={addRecording} variant="outline" size="sm" className="font-sans bg-transparent">
-            <Plus className="h-4 w-4 mr-1" /> Add Recording
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={addRecording} variant="outline" size="sm" className="font-sans bg-transparent">
+              <Plus className="h-4 w-4 mr-1" /> Add Recording
+            </Button>
+            <Button
+              onClick={handleSaveRecordings}
+              disabled={recordingsSaving}
+              variant="outline"
+              size="sm"
+              className="font-sans bg-transparent"
+            >
+              {recordingsSaving ? "Saving..." : "Save Recordings"}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {recordings.map((rec, index) => (
@@ -183,6 +202,7 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
                   recording_id={rec.id}
                   current_file={rec.filename}
                   on_upload={(file_url, file_name) => {
+                    console.log("[v0] Upload callback triggered. file_url:", file_url, "file_name:", file_name)
                     updateRecording(rec.id, "file_url", file_url)
                     updateRecording(rec.id, "filename", file_name)
                   }}
