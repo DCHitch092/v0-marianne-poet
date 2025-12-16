@@ -41,7 +41,8 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
 
   const handleSaveRecordings = async () => {
     setRecordingsSaving(true)
-    console.log("[v0] Saving recordings. Current content:", JSON.stringify(pageContent, null, 2))
+    console.log("[v0] Before Save - pageContent recordings:", JSON.stringify(pageContent.recordings, null, 2))
+    console.log("[v0] Before Save - Full pageContent:", JSON.stringify(pageContent, null, 2))
     await saveSection("listen_page")
     setRecordingsSaving(false)
   }

@@ -52,6 +52,8 @@ export function AdminDashboard({ initialContent, userEmail }: AdminDashboardProp
 
   const saveSection = async (sectionId: string) => {
     const supabase = createClient()
+    console.log("[v0] Saving section:", sectionId)
+    console.log("[v0] Content being saved:", JSON.stringify(content[sectionId]?.content, null, 2))
     const { error } = await supabase.from("site_content").upsert({
       id: sectionId,
       content: content[sectionId]?.content,
@@ -63,6 +65,7 @@ export function AdminDashboard({ initialContent, userEmail }: AdminDashboardProp
       alert("Failed to save. Please try again.")
       return false
     }
+    console.log("[v0] Save successful for:", sectionId)
     return true
   }
 
