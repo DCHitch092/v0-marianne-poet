@@ -10,6 +10,7 @@ type Recording = {
   id: string
   label: string
   filename: string
+  file_url?: string
   enabled: boolean
   order: number
 }
@@ -80,7 +81,7 @@ export default async function ListenPage() {
             <div key={recording.id} className="space-y-3">
               <p className="font-sans text-xs tracking-widest uppercase text-muted-foreground/60">{recording.label}</p>
               <audio controls preload="none" className="w-full" aria-label={recording.label}>
-                <source src={`/audio/${recording.filename}`} type="audio/mp4" />
+                <source src={recording.file_url || `/audio/${recording.filename}`} type="audio/mp4" />
                 Your browser does not support the audio element.
               </audio>
             </div>

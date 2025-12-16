@@ -9,11 +9,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { ChevronUp, ChevronDown, Plus, Trash2 } from "lucide-react"
 import type { ContentData } from "../admin-dashboard"
+import { AudioUploader } from "../audio-uploader"
 
 type Recording = {
   id: string
   label: string
   filename: string
+  file_url?: string
   enabled: boolean
   order: number
 }
@@ -177,15 +179,14 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
                     className="font-sans h-8"
                   />
                 </div>
-                <div className="space-y-1">
-                  <Label className="font-sans text-xs text-muted-foreground">Filename</Label>
-                  <Input
-                    value={rec.filename}
-                    onChange={(e) => updateRecording(rec.id, "filename", e.target.value)}
-                    className="font-sans h-8"
-                    placeholder="audio-file.m4a"
-                  />
-                </div>
+                <AudioUploader
+                  recording_id={rec.id}
+                  current_file={rec.filename}
+                  on_upload={(file_url, file_name) => {
+                    updateRecording(rec.id, "file_url", file_url)
+                    updateRecording(rec.id, "filename", file_name)
+                  }}
+                />
               </div>
               <Button
                 variant="ghost"
