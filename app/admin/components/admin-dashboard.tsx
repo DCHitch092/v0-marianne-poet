@@ -72,7 +72,9 @@ export function AdminDashboard({ initialContent, userEmail }: AdminDashboardProp
       const response = await fetch("/api/revalidate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tag: "site-content" }),
+        body: JSON.stringify({
+          paths: ["/", "/read", "/listen", "/books", "/about", "/archive", "/intervals", "/contact"],
+        }),
       })
 
       if (!response.ok) throw new Error("Failed to publish")
