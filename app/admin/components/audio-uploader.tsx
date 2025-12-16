@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,9 +23,13 @@ export function AudioUploader({ recording_id, current_file, on_upload }: AudioUp
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith("audio/")) {
       setError("Please select an audio file")
+      return
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+      setError("File size must be less than 100MB")
       return
     }
 
@@ -34,26 +38,25 @@ export function AudioUploader({ recording_id, current_file, on_upload }: AudioUp
     setSuccess(false)
 
     try {
-      const form_data = new FormData()
-      form_data.append("file", file)
-      form_data.append("recording_id", recording_id)
+      const supabase = createClient()
+      const file_name = `${recording_id}_${Date.now()}_${file.name}`
 
-      const response = await fetch("/api/upload-audio", {
-        method: "POST",
-        body: form_data,
+      const { data, error: upload_error } = await supabase.storage.from("audio").upload(file_name, file, {
+        upsert: false,
       })
 
-      if (!response.ok) {
-        const error_data = await response.json()
-        throw new Error(error_data.error || "Upload failed")
+      if (upload_error) {
+        throw new Error(upload_error.message)
       }
 
-      const data = await response.json()
-      on_upload(data.file_url, file.name)
+      const { data: url_data } = supabase.storage.from("audio").getPublicUrl(file_name)
+
+      on_upload(url_data.publicUrl, file.name)
       setSuccess(true)
       setTimeout(() => setSuccess(false), 2000)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed")
+      console.log("[v0] Upload error:", err)
     } finally {
       setUploading(false)
     }
