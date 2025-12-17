@@ -77,6 +77,11 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
     updateContent("listen_page", { ...pageContent, recordings: updated })
   }
 
+  const updateRecordingMultiple = (recId: string, updates: Record<string, string>) => {
+    const updated = recordings.map((rec) => (rec.id === recId ? { ...rec, ...updates } : rec))
+    updateContent("listen_page", { ...pageContent, recordings: updated })
+  }
+
   const addRecording = () => {
     const newRec: Recording = {
       id: `rec_${Date.now()}`,
@@ -204,8 +209,7 @@ export function ListenEditor({ content, updateContent, saveSection }: ListenEdit
                   current_file={rec.filename}
                   on_upload={(file_url, file_name) => {
                     console.log("[v0] Upload callback triggered. file_url:", file_url, "file_name:", file_name)
-                    updateRecording(rec.id, "file_url", file_url)
-                    updateRecording(rec.id, "filename", file_name)
+                    updateRecordingMultiple(rec.id, { file_url, filename: file_name })
                   }}
                 />
               </div>
